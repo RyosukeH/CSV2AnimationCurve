@@ -51,6 +51,19 @@ public class CSVReader_sample : MonoBehaviour {
 		TimeSpan ts = TimeSpan.Parse (temp);
 		//		Debug.Log ("ts total sec: " + ts.TotalSeconds);
 		return (float)ts.TotalSeconds;
+
+	}
+
+	float GetTotalMilliSecond (string time_) {
+		// csvでは00:00の記述なので時間の部分を追加している
+		// 00:00:00の書き方ではこの部分不要
+		//		string temp = "0:" + time_;		
+		TimeSpan ts = TimeSpan.Parse (time_);
+		//		TimeSpan ts = TimeSpan.Parse (temp);
+		//		Debug.Log ("ts total sec: " + ts.TotalSeconds);
+		//		return (float)ts.TotalSeconds;
+		return (float)ts.TotalMilliseconds;
+
 	}
 		
 
@@ -58,7 +71,11 @@ public class CSVReader_sample : MonoBehaviour {
 		AnimationCurve curve = new AnimationCurve ();
 		for (int i = 0; i < csvFile.Count; i++) {
 			// 100で割って正規化
-			curve.AddKey (KeyframeUtil.GetNew (GetTotalSecond (csvFile [i].time), (float)csvFile [i].value_ / 100f, TangentMode.Linear));
+//			curve.AddKey (KeyframeUtil.GetNew (GetTotalSecond (csvFile [i].time), (float)csvFile [i].value_ / 100f, TangentMode.Linear));
+			float f = GetTotalMilliSecond (csvFile [i].time);
+			// 秒にする
+			f = f / 1000f;
+			curve.AddKey (KeyframeUtil.GetNew (f, (float)csvFile [i].value_ / 100f, TangentMode.Linear));
 		}
 		curve.UpdateAllLinearTangents ();
 
