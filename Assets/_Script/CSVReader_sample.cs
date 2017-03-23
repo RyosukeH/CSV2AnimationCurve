@@ -67,17 +67,75 @@ public class CSVReader_sample : MonoBehaviour {
 	}
 		
 
-	public AnimationCurve CreateLinearAnimationCurve () {
+	//	public AnimationCurve CreateLinearAnimationCurve () {
+	//		AnimationCurve curve = new AnimationCurve ();
+	//		for (int i = 0; i < csvFile.Count; i++) {
+	//			// 100で割って正規化
+	////			curve.AddKey (KeyframeUtil.GetNew (GetTotalSecond (csvFile [i].time), (float)csvFile [i].value_ / 100f, TangentMode.Linear));
+	//			float f = GetTotalMilliSecond (csvFile [i].time);
+	//			// 秒にする
+	//			f = f / 1000f;
+	//
+	//			// Editor上でしか使用できない...
+	////			curve.AddKey (KeyframeUtil.GetNew (f, (float)csvFile [i].value_ / 100f, TangentMode.Linear));
+	//			curve.AddKey (new Keyframe (f, (float)csvFile [i].value_ / 100f));
+	//		}
+	////		curve.UpdateAllLinearTangents ();
+	//
+	//		return curve;
+	//	}
+
+	/// <summary>
+	/// Creates the smooth tangent animation curve.
+	/// </summary>
+	/// <returns>The smooth animation curve.</returns>
+	public AnimationCurve CreateSmoothAnimationCurve () {
 		AnimationCurve curve = new AnimationCurve ();
 		for (int i = 0; i < csvFile.Count; i++) {
-			// 100で割って正規化
-//			curve.AddKey (KeyframeUtil.GetNew (GetTotalSecond (csvFile [i].time), (float)csvFile [i].value_ / 100f, TangentMode.Linear));
+			
 			float f = GetTotalMilliSecond (csvFile [i].time);
 			// 秒にする
 			f = f / 1000f;
-			curve.AddKey (KeyframeUtil.GetNew (f, (float)csvFile [i].value_ / 100f, TangentMode.Linear));
+	
+			// Editor上でしか使用できない...
+			//			curve.AddKey (KeyframeUtil.GetNew (f, (float)csvFile [i].value_ / 100f, TangentMode.Linear));
+
+			// 100で割って正規化
+			curve.AddKey (new Keyframe (f, (float)csvFile [i].value_ / 100f));
 		}
-		curve.UpdateAllLinearTangents ();
+
+		return curve;
+	}
+
+	/// <summary>
+	/// Creates the linear tangent animation curve.
+	/// </summary>
+	/// <returns>The linear animation curve.</returns>
+	public AnimationCurve CreateLinearAnimationCurve () {
+		AnimationCurve curve = new AnimationCurve ();
+		List<Keyframe> ks = new List<Keyframe> ();
+		for (int i = 0; i < csvFile.Count - 1; i++) {
+
+			float f = GetTotalMilliSecond (csvFile [i].time);
+			// 秒にする
+			f = f / 1000f;
+
+			float f1 = GetTotalMilliSecond (csvFile [i + 1].time);
+			f1 = f1 / 1000f;
+
+
+			// Editor上でしか使用できない...
+			//			curve.AddKey (KeyframeUtil.GetNew (f, (float)csvFile [i].value_ / 100f, TangentMode.Linear));
+
+			// 100で割って正規化
+			AnimationCurve c = AnimationCurve.Linear (f, (float)csvFile [i].value_ / 100f, f1, (float)csvFile [i + 1].value_ / 100f);
+			foreach (Keyframe _k in c.keys) {
+				ks.Add (_k);
+			}
+		}
+
+		curve = new AnimationCurve (ks.ToArray ());
+		//		curve.UpdateAllLinearTangents ();
 
 		return curve;
 	}
